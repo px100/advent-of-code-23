@@ -1,3 +1,10 @@
+fn main(input: &str) -> (usize, usize) {
+  input.split('\n').fold((0, 0), |(p1, p2), line| {
+    let (parsed_id, parsed_value) = run_game(line).unwrap();
+    (p1 + parsed_id, p2 + parsed_value)
+  })
+}
+
 fn run_game(line: &str) -> Option<(usize, usize)> {
   let (id, game) = line.trim_start_matches("Game ").split_once(':')?;
   let (mut red_max, mut green_max, mut blue_max, mut is_possible) = (0, 0, 0, true);
@@ -21,11 +28,4 @@ fn run_game(line: &str) -> Option<(usize, usize)> {
     }
   }
   Some((if is_possible { id.parse().ok()? } else { 0 }, red_max * green_max * blue_max))
-}
-
-fn main(input: &str) -> (usize, usize) {
-  input.split('\n').fold((0, 0), |(p1, p2), line| {
-    let (parsed_id, parsed_value) = run_game(line).unwrap();
-    (p1 + parsed_id, p2 + parsed_value)
-  })
 }
