@@ -1,3 +1,5 @@
+use std::array::from_fn;
+
 use hashbrown::HashMap;
 use itertools::Itertools;
 
@@ -35,7 +37,7 @@ fn main(input: &str) -> (usize, usize) {
     .filter(|&(x, m, a, s)| filter(&rules, [x, m, a, s]))
     .map(|(x, m, a, s)| x + m + a + s)
     .sum();
-  let p2 = count(&rules, "in", std::array::from_fn(|_| (1..=4000).collect::<Vec<_>>()));
+  let p2 = count(&rules, "in", from_fn(|_| (1..=4000).collect::<Vec<_>>()));
   (p1, p2)
 }
 
