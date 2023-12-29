@@ -23,11 +23,8 @@ fn get_sum(initial_values: Vec<isize>) -> (isize, isize) {
       .collect();
     sequences.push(differences);
   }
-  let (sum_last, diff_first) = sequences
+  sequences
     .into_iter()
     .rev()
-    .fold((0, 0), |(sum, diff), sequence| {
-      (sequence.last().unwrap() + sum, sequence[0] - diff)
-    });
-  (sum_last, diff_first)
+    .fold((0, 0), |(sum, diff), sequence| (sequence.last().unwrap() + sum, sequence[0] - diff))
 }
