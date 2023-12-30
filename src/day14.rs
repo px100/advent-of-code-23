@@ -1,35 +1,38 @@
 use hashbrown::HashMap;
 
 fn main(input: &str) -> (usize, usize) {
-  let mut current_map = input
+  let mut map = input
     .lines()
     .map(|l| l.as_bytes().to_vec())
     .collect::<Vec<_>>();
-  let p1 = {
-    let mut map = current_map.clone();
-    roll_north(&mut map);
-    load_map(&map)
-  };
   let mut seen = HashMap::new();
   for i in 1..1000000000 {
     for _ in 0..4 {
-      roll_north(&mut current_map);
-      current_map = (0..current_map[0].len())
-        .map(|c| (0..current_map.len())
-          .map(|r| current_map[r][c]).rev()
+      roll_map(&mut map);
+      map = (0..map[0].len())
+        .map(|c| (0..map.len())
+          .map(|r| map[r][c]).rev()
           .collect())
         .collect();
     }
-    match seen.insert(current_map.clone(), i) {
-      Some(seen_at) => {
-        if (1000000000 - i) % (i - seen_at) == 0 {
+    match seen.insert(map.clone(), i) {
+      Some(x) => {
+        if (1000000000 - i) % (i - x) == 0 {
           break;
         }
       }
       None => {}
     }
   }
-  (p1, load_map(&current_map))
+  (solve_p1(&mut map), load_map(&map))
+}
+
+fn solve_p1(map: &mut Vec<Vec<u8>>) -> usize {
+  load_map(&{
+    let mut map_clone = map.clone();
+    roll_map(&mut map_clone);
+    map_clone
+  })
 }
 
 fn load_map(map: &Vec<Vec<u8>>) -> usize {
@@ -41,7 +44,7 @@ fn load_map(map: &Vec<Vec<u8>>) -> usize {
     .sum()
 }
 
-fn roll_north(map: &mut Vec<Vec<u8>>) {
+fn roll_map(map: &mut Vec<Vec<u8>>) {
   let mut done;
   while {
     done = true;
