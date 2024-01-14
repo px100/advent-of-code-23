@@ -1,5 +1,4 @@
 use std::collections::{HashMap, HashSet, VecDeque};
-use std::iter::FromIterator;
 
 fn main(input: &str) -> (usize) {
   let graph: HashMap<_, HashSet<_>> = input
@@ -23,8 +22,8 @@ fn main(input: &str) -> (usize) {
 fn solve(graph: &HashMap<&str, HashSet<&str>>, source: &str, target: &str) -> Option<usize> {
   let mut flow = HashMap::new();
   for _i in 0..=3 {
-    let mut predecessors = HashMap::new();
     let mut queue = VecDeque::from_iter([source].iter().cloned());
+    let mut predecessors = HashMap::new();
     let mut visited = 0;
     while let Some(cur_vertex) = queue.pop_front() {
       if predecessors.contains_key(target) {
@@ -36,7 +35,6 @@ fn solve(graph: &HashMap<&str, HashSet<&str>>, source: &str, target: &str) -> Op
         .filter(|&&next| next != source)
         .filter(|&&next| !predecessors.contains_key(next))
         .filter(|&&next| *flow.get(&(cur_vertex, next)).unwrap_or(&0) < 1)
-        .cloned()
         .collect::<Vec<_>>();
       queue.extend(neighbors);
       for &next_vertex in &graph[cur_vertex] {
@@ -52,16 +50,16 @@ fn solve(graph: &HashMap<&str, HashSet<&str>>, source: &str, target: &str) -> Op
     if !predecessors.contains_key(target) {
       return Some(visited * (graph.len() - visited)).filter(|_| visited != graph.len());
     }
-    let delta_flow = predecessors
+    let delta = predecessors
       .iter()
-      .fold(i64::MAX, |df, (&current, &previous)| {
-        df.min(1 - *flow.get(&(previous, current)).unwrap_or(&0))
+      .fold(i64::MAX, |df, (&cur, &prev)| {
+        df.min(1 - *flow.get(&(prev, cur)).unwrap_or(&0))
       });
     let mut cur_vertex = target;
-    while let Some(&previous_vertex) = predecessors.get(cur_vertex) {
-      *flow.entry((previous_vertex, cur_vertex)).or_default() += delta_flow;
-      *flow.entry((cur_vertex, previous_vertex)).or_default() -= delta_flow;
-      cur_vertex = previous_vertex;
+    while let Some(&prev_vertex) = predecessors.get(cur_vertex) {
+      *flow.entry((prev_vertex, cur_vertex)).or_default() += delta;
+      *flow.entry((cur_vertex, prev_vertex)).or_default() -= delta;
+      cur_vertex = prev_vertex;
     }
   }
   None
